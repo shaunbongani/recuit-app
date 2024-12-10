@@ -15,3 +15,15 @@ def score():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    data = request.json
+    resume = data['resume']
+    job_descriptions = data['job_descriptions']
+    
+    indices, scores = recommend_jobs(resume, job_descriptions)
+    recommendations = [{"job_index": int(idx), "score": round(score * 100, 2)} for idx, score in zip(indices, scores)]
+    return jsonify(recommendations)
+
