@@ -120,3 +120,46 @@ function renderJobRecommendations(recommendations) {
         </div>
     `).join('');
 }
+
+// Handle Login
+const loginForm = document.getElementById('login-form');
+const loginMessage = document.getElementById('login-message');
+const dashboardDiv = document.getElementById('dashboard');
+
+loginForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            loginMessage.textContent = data.error;
+        } else {
+            loginMessage.textContent = `Login successful! Role: ${data.role}`;
+            fetchDashboard();
+        }
+    })
+    .catch(error => console.error('Error during login:', error));
+});
+
+// Fetch Dashboard Data
+function fetchDashboard() {
+    fetch('http://localhost:5000/dashboard', {
+        credentials: 'include' // Include cookies for authenticated requests
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            dashboardDiv.textContent = data.error;
+        } else {
+            dashboardDiv.textContent = data.message;
+        }
+    })
+    .catch(error => console.error('Error fetching dashboard:', error));
+}
