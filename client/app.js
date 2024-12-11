@@ -97,3 +97,26 @@ function renderClusteringChart(clusters) {
         }
     });
 }
+
+
+
+function fetchJobRecommendations(resume, jobDescriptions) {
+    fetch('http://localhost:5000/recommend-jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resume: resume, job_descriptions: jobDescriptions })
+    })
+    .then(response => response.json())
+    .then(data => renderJobRecommendations(data))
+    .catch(error => console.error('Error fetching recommendations:', error));
+}
+
+function renderJobRecommendations(recommendations) {
+    const recommendationList = document.getElementById('recommendations');
+    recommendationList.innerHTML = recommendations.map(rec => `
+        <div>
+            <h4>Job ${rec.job_index + 1}</h4>
+            <p>Score: ${rec.score}%</p>
+        </div>
+    `).join('');
+}

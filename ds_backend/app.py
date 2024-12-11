@@ -50,3 +50,19 @@ def cluster_resumes():
 
     clusters = kmeans.labels_.tolist()
     return jsonify({"clusters": clusters})
+
+
+
+@app.route('/recommend-jobs', methods=['POST'])
+def recommend_jobs():
+    data = request.json
+    resume = data['resume']
+    job_descriptions = data['job_descriptions']
+
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform([resume] + job_descriptions)
+    scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])[0]
+
+    recommendations = [{"job_index": i, "score": round(score * 100, 2)} for i, score in enumerate(scores)]
+    recommendations.sort(key=lambda x: x['score'], reverse=True)
+    return jsonify(recommendations)
