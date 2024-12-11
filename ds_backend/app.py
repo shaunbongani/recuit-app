@@ -38,3 +38,15 @@ def cluster_applicants(resumes, n_clusters=3):
     clusters = kmeans.labels_
     return clusters
 
+@app.route('/cluster-resumes', methods=['POST'])
+def cluster_resumes():
+    data = request.json
+    resumes = data['resumes']
+
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(resumes)
+    kmeans = KMeans(n_clusters=3, random_state=42)
+    kmeans.fit(tfidf_matrix)
+
+    clusters = kmeans.labels_.tolist()
+    return jsonify({"clusters": clusters})
