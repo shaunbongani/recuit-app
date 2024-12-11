@@ -29,3 +29,39 @@ fetch('http://localhost:3001/jobs')
         .catch(error => console.error('Error:', error));
     });
     
+
+
+// Fetch Match Scores
+function fetchMatchScores(jobDesc, resumes) {
+    fetch('http://localhost:5000/match-scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ job_desc: jobDesc, resumes: resumes })
+    })
+    .then(response => response.json())
+    .then(data => renderMatchScoresChart(data.scores))
+    .catch(error => console.error('Error fetching match scores:', error));
+}
+
+// Render Match Scores Chart
+function renderMatchScoresChart(scores) {
+    const ctx = document.getElementById('match-scores-chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: scores.map((_, i) => `Resume ${i + 1}`),
+            datasets: [{
+                label: 'Match Scores (%)',
+                data: scores,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
