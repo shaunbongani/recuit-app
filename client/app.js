@@ -65,3 +65,35 @@ function renderMatchScoresChart(scores) {
         }
     });
 }
+
+// Fetch Clustering Results
+function fetchClusteringResults(resumes) {
+    fetch('http://localhost:5000/cluster-resumes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumes: resumes })
+    })
+    .then(response => response.json())
+    .then(data => renderClusteringChart(data.clusters))
+    .catch(error => console.error('Error fetching clustering results:', error));
+}
+
+// Render Clustering Chart
+function renderClusteringChart(clusters) {
+    const clusterCounts = clusters.reduce((acc, cluster) => {
+        acc[cluster] = (acc[cluster] || 0) + 1;
+        return acc;
+    }, {});
+
+    const ctx = document.getElementById('clustering-chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(clusterCounts).map(c => `Cluster ${c}`),
+            datasets: [{
+                data: Object.values(clusterCounts),
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+            }]
+        }
+    });
+}
